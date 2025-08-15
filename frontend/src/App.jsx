@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import Register from "./components/Register.jsx"; // Your Register component
-import Login from "./components/Login.jsx"; // Your Login component
+import Register from "./components/Register.jsx";
+import Login from "./components/Login.jsx";
+import HomeownerDashboard from "./components/HomeownerDashboard.jsx";
+import ContractorDashboard from "./components/ContractorDashboard.jsx";
+import ArchitectDashboard from "./components/ArchitectDashboard.jsx";
+import AuthorizedRedirectURIs from "./components/AuthorizedRedirectURIs.jsx";
+import AdminLogin from "./components/AdminLogin.jsx";
+import AdminDashboard from "./components/AdminDashboard.jsx";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute.jsx";
 
 // Home page component
 function Home() {
@@ -203,6 +210,16 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/homeowner-dashboard" element={<HomeownerDashboard />} />
+        <Route path="/contractor-dashboard" element={<ContractorDashboard />} />
+        <Route path="/architect-dashboard" element={<ArchitectDashboard />} />
+        <Route path="/authorized-redirect-uris" element={<AuthorizedRedirectURIs />} />
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin-dashboard" element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        } />
       </Routes>
     </Router>
   );

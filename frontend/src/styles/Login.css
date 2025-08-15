@@ -76,30 +76,33 @@ input[type='password']:focus {
   outline: none;
 }
 
-.google-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  background: white;
-  color: #2563eb;
+/* Align Google custom button style with Register "Create account" button */
+.register-form-section .google-custom {
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  background: linear-gradient(135deg, #0b5ed7, #0846a8);
+  color: white;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 700;
-  border-radius: 50px;
-  border: 2px solid #2563eb;
   cursor: pointer;
-  padding: 1rem 0;
-  font-size: 1.1rem;
-  user-select: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+  box-shadow: 0 8px 22px rgba(11, 94, 215, 0.35);
 }
 
-.google-btn:hover,
-.google-btn:focus {
-  background: #2563eb;
-  color: white;
+.register-form-section .google-custom:hover,
+.register-form-section .google-custom:focus {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+  box-shadow: 0 12px 28px rgba(11, 94, 215, 0.45);
   outline: none;
 }
+
+/* Remove old Google button styles if any */
+.google-btn { display: none; }
+.google-btn:hover, .google-btn:focus { display: none; }
 
 .google-icon {
   width: 22px;

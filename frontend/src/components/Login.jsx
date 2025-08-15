@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
-import '../styles/Login.css'; // Make sure path is correct
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/Register.css';
+import '../styles/Login.css';
+
+const GOOGLE_CLIENT_ID = "1024134456606-et46lrm2ce8tl567a4m4s4e0u3v5t4sa.apps.googleusercontent.com";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +12,56 @@ const Login = () => {
   });
 
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  // Google Sign-In state
+  const googleBtn = useRef(null);
+  const [googleError, setGoogleError] = useState('');
+
+  useEffect(() => {
+    let canceled = false;
+    let attempts = 0;
+    const maxAttempts = 60; // ~9s at 150ms interval
+
+    const tryInit = () => {
+      if (canceled) return;
+      if (window.google?.accounts?.id && googleBtn.current) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: false,
+        });
+        window.google.accounts.id.renderButton(googleBtn.current, {
+          theme: "filled_blue",
+          size: "large",
+          text: "signin_with",
+          shape: "pill",
+          logo_alignment: "left",
+          width: 350,
+        });
+        return true;
+      }
+      return false;
+    };
+
+    if (!tryInit()) {
+      const intervalId = setInterval(() => {
+        attempts += 1;
+        if (tryInit() || attempts >= maxAttempts) {
+          clearInterval(intervalId);
+        }
+      }, 150);
+    }
+
+    return () => {
+      canceled = true;
+      if (window.google?.accounts?.id) {
+        try { window.google.accounts.id.cancel(); } catch {}
+      }
+    };
+  }, []);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -16,6 +70,10 @@ const Login = () => {
   };
 
   const validateEmail = email => {
+    // Allow admin email or Gmail addresses
+    if (email === 'shijinthomas369@gmail.com') {
+      return true;
+    }
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     return emailRegex.test(email);
   };
@@ -30,7 +88,7 @@ const Login = () => {
     return '';
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!formData.email) {
@@ -39,7 +97,7 @@ const Login = () => {
     }
 
     if (!validateEmail(formData.email)) {
-      setError('Please enter a valid Gmail address (must end with @gmail.com).');
+      setError('Please enter a valid Gmail address or admin email.');
       return;
     }
 
@@ -49,89 +107,187 @@ const Login = () => {
       return;
     }
 
-    // Submit logic here (e.g., API call)
-    alert('Login successful!');
-    setFormData({
-      email: '',
-      password: '',
-    });
+    try {
+      const res = await fetch('/buildhub/backend/api/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const result = await res.json();
+      if (result.success) {
+        // Check if it's admin login
+        if (result.redirect === 'admin-dashboard') {
+          // Store admin session info
+          localStorage.setItem('admin_logged_in', 'true');
+          localStorage.setItem('admin_username', 'admin');
+          navigate('/admin-dashboard');
+        } else {
+          // Store user data for dashboard access
+          sessionStorage.setItem('user', JSON.stringify(result.user));
+          
+          // Persist minimal user info for navbar display
+          localStorage.setItem('bh_user', JSON.stringify({
+            email: formData.email,
+            name: result.user ? `${result.user.first_name} ${result.user.last_name}`.trim() : '',
+            method: 'email',
+            role: result.user?.role
+          }));
+          
+          // Redirect based on user role
+          if (result.redirect === 'homeowner-dashboard') {
+            navigate('/homeowner-dashboard');
+          } else if (result.user?.role === 'contractor') {
+            navigate('/contractor-dashboard');
+          } else if (result.user?.role === 'architect') {
+            navigate('/architect-dashboard');
+          } else {
+            navigate('/login');
+          }
+        }
+        setFormData({ email: '', password: '' });
+        setError('');
+      } else {
+        setError(result.message || 'Login failed.');
+      }
+    } catch (err) {
+      setError('Server error. Please try again.');
+    }
+  };
+
+  // Google Sign-In callback
+  const handleGoogleResponse = async (response) => {
+    setGoogleError('');
+    window.google.accounts.id.disableAutoSelect();
+    window.google.accounts.id.revoke(response.credential, () => {});
+
+    // Get user info from Google
+    const userInfoRes = await fetch(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${response.credential}`
+    );
+    const userInfo = await userInfoRes.json();
+
+    // Send to backend for login
+    try {
+      const res = await fetch('/buildhub/backend/api/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          google: true,
+          email: userInfo.email,
+        }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        // Store user data for dashboard access
+        if (result.user) {
+          sessionStorage.setItem('user', JSON.stringify(result.user));
+        }
+        
+        // Persist minimal google user info for navbar display
+        localStorage.setItem('bh_user', JSON.stringify({
+          email: userInfo.email,
+          name: `${userInfo.given_name || ''} ${userInfo.family_name || ''}`.trim(),
+          picture: userInfo.picture,
+          method: 'google',
+          role: result.user?.role
+        }));
+        
+        // Redirect based on user role
+        if (result.redirect === 'homeowner-dashboard') {
+          navigate('/homeowner-dashboard');
+        } else if (result.redirect === 'contractor-dashboard') {
+          navigate('/contractor-dashboard');
+        } else if (result.redirect === 'architect-dashboard') {
+          navigate('/architect-dashboard');
+        } else {
+          alert(result.message || 'Login successful! Await admin verification.');
+          navigate('/login');
+        }
+      } else {
+        setGoogleError(result.message || 'Google login failed.');
+      }
+    } catch (err) {
+      setGoogleError('Server error. Please try again.');
+    }
   };
 
   return (
-    <main className="login-container" aria-label="Login form">
-      <h2>Login to your account</h2>
-      <form onSubmit={handleSubmit} noValidate>
-        <div className="full-width">
-          <label htmlFor="email">Email Address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            placeholder="your.email@gmail.com"
-            value={formData.email}
-            onChange={handleChange}
-            autoComplete="email"
-            aria-describedby="emailError"
-          />
+    <main className="register-page" aria-label="Login section">
+      {/* Left: Brand / Identity (reuse styles) */}
+      <section className="register-logo-section" aria-label="BuildHub brand">
+        <div className="brand">
+          <img src="/images/logo.png" alt="BuildHub Logo" className="brand-logo" />
+          <h1 className="brand-title">BuildHub</h1>
+          <p className="brand-tagline">Welcome back! Continue building with confidence.</p>
+          <ul className="brand-highlights" aria-label="Key highlights">
+            <li>Secure login</li>
+            <li>Verified professionals</li>
+            <li>Fast project matching</li>
+          </ul>
         </div>
+      </section>
 
-        <div className="full-width">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
-            autoComplete="current-password"
-            aria-describedby="passwordError"
-          />
-        </div>
+      {/* Right: Login Form with glass card */}
+      <section className="register-form-section" aria-label="Login form">
+        <h2>Login to your account</h2>
+        <p className="subtitle">Access your dashboard and projects</p>
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="full-width">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="your.email@gmail.com"
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="email"
+              aria-describedby="emailError"
+            />
+          </div>
 
-        {error && (
-          <p className="error" role="alert" style={{ color: 'red', marginTop: '0.5rem' }}>
-            {error}
-          </p>
-        )}
+          <div className="full-width">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              aria-describedby="passwordError"
+            />
+          </div>
 
-        <button type="submit" className="btn-submit">
-          Login
-        </button>
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
 
-        <button
-          type="button"
-          className="google-btn"
-          aria-label="Sign in with Google"
-          onClick={() => alert('Google SignIn - implement OAuth')}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 48 48"
-            role="img"
-            aria-hidden="true"
-            className="google-icon"
-          >
-            <path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.36 9.12 3.59l6.79-6.79C34.96 2.68 29.82 0 24 0 14.82 0 7.01 5.87 3.7 14.15l7.91 6.14C13.62 14.42 18.33 9.5 24 9.5z" />
-            <path fill="#34A853" d="M46.4 24.5c0-1.5-.13-2.88-.38-4.25H24v8.04h12.84c-.56 3.03-2.28 5.58-4.87 7.33l7.87 6.11c4.62-4.26 7.66-10.53 7.66-17.23z" />
-            <path fill="#FBBC05" d="M11.61 28.29a14.77 14.77 0 0 1 0-8.58v-6.14L3.7 14.15A23.85 23.85 0 0 0 0 24c0 3.76 1.02 7.28 2.84 10.34l8.77-6.05z" />
-            <path fill="#EA4335" d="M24 48c6.48 0 11.92-2.13 15.88-5.77l-7.87-6.11c-2.2 1.5-5.01 2.41-8.01 2.41-6.39 0-11.8-4.32-13.75-10.1l-8.77 6.04C7.01 42.13 14.82 48 24 48z" />
-          </svg>
-          Sign in with Google
-        </button>
+          <button type="submit" className="btn-submit">Login</button>
 
-        <div className="extra-links">
-          <a href="/forgot-password" aria-label="Forgot password?">
-            Forgot password?
-          </a>{' '}
-          |{' '}
-          <a href="/register" aria-label="Go to registration page">
-            Don't have an account? Register
-          </a>
-        </div>
-      </form>
+          {/* Inline links */}
+          <div className="form-links">
+            <a href="/forgot-password" aria-label="Forgot password?">Forgot password?</a>
+            <a href="/register" aria-label="Go to registration page">Don't have an account? Register</a>
+          </div>
+
+          {/* Google Sign-In button bottom */}
+          <div className="google-signin-block" style={{ marginTop: 12 }}>
+            <div className="google-btn-container" ref={googleBtn} />
+          </div>
+
+          {googleError && (
+            <p className="error" role="alert">
+              {googleError}
+            </p>
+          )}
+        </form>
+      </section>
     </main>
   );
 };
