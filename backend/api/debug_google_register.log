@@ -142,3 +142,91 @@
 
 )
 
+2025-08-18T09:53:32+02:00 | POST: Array
+(
+    [firstName] => KIRAN SHIBU THOMAS
+    [lastName] => MCA2024-2026
+    [email] => kiranshibuthomas2026@mca.ajce.in
+    [role] => contractor
+    [password] => 0.c3fhft9opt!A1
+)
+ | FILES: Array
+(
+    [license] => Array
+        (
+            [name] => license_20.jpeg
+            [full_path] => license_20.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php468E.tmp
+            [error] => 0
+            [size] => 975503
+        )
+
+)
+
+2025-08-18T11:52:59+02:00 | POST: Array
+(
+    [firstName] => Shijin
+    [lastName] => Thomas
+    [email] => shijinthomas1501@gmail.com
+    [role] => contractor
+    [password] => 0.yngyik7tz4!A1
+)
+ | FILES: Array
+(
+    [license] => Array
+        (
+            [name] => license_20.jpeg
+            [full_path] => license_20.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\phpA640.tmp
+            [error] => 0
+            [size] => 975503
+        )
+
+)
+
+2025-08-18T11:57:50+02:00 | POST: Array
+(
+    [firstName] => Fathima
+    [lastName] => Shibu
+    [email] => fathima470077@gmail.com
+    [role] => architect
+    [password] => .fkhk3m9gncg!A1
+)
+ | FILES: Array
+(
+    [portfolio] => Array
+        (
+            [name] => license_20.jpeg
+            [full_path] => license_20.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php1515.tmp
+            [error] => 0
+            [size] => 975503
+        )
+
+)
+
+2025-08-19T09:01:06+02:00 | POST: Array
+(
+    [firstName] => APARNA K SANTHOSH
+    [lastName] => MCA2024-2026
+    [email] => aparnaksanthosh2026@mca.ajce.in
+    [role] => architect
+    [password] => 0.bhh16n76va!A1
+)
+ | FILES: Array
+(
+    [portfolio] => Array
+        (
+            [name] => license_20.jpeg
+            [full_path] => license_20.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php9C00.tmp
+            [error] => 0
+            [size] => 975503
+        )
+
+)
+
