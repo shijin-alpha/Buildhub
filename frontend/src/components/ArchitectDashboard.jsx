@@ -26,11 +26,23 @@ const ArchitectDashboard = () => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
-    
-    if (userData.id) {
-      fetchLayoutRequests();
-      fetchMyDesigns();
-    }
+
+    // Strict: prevent cached back navigation showing dashboard
+    import('../utils/session').then(({ preventCache, verifyServerSession }) => {
+      preventCache();
+      (async () => {
+        const serverAuth = await verifyServerSession();
+        if (!userData.id || userData.role !== 'architect' || !serverAuth) {
+          sessionStorage.removeItem('user');
+          localStorage.removeItem('bh_user');
+          navigate('/login', { replace: true });
+          return;
+        }
+        // proceed
+        fetchLayoutRequests();
+        fetchMyDesigns();
+      })();
+    });
   }, []);
 
   const fetchLayoutRequests = async () => {
@@ -60,10 +72,11 @@ const ArchitectDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await fetch('/buildhub/backend/api/logout.php', { method: 'POST', credentials: 'include' }); } catch {}
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handleUploadSubmit = async (e) => {
@@ -246,7 +259,7 @@ const ArchitectDashboard = () => {
         <div className="header-content">
           <div>
             <h1>Layout Requests</h1>
-            <p>Client requests waiting for architectural designs</p>
+            <p>Client requests sent to you and open requests</p>
           </div>
           <button 
             className="btn btn-primary"
@@ -257,6 +270,16 @@ const ArchitectDashboard = () => {
         </div>
       </div>
 
+      {/* Assigned to me */}
+      <div className="section-card">
+        <div className="section-header">
+          <h2>Requests Assigned To Me</h2>
+          <p>Homeowners selected you for these requests</p>
+        </div>
+        <AssignedRequests onCreateFromAssigned={(requestId) => { setUploadData({ ...uploadData, request_id: requestId }); setShowUploadForm(true); }} />
+      </div>
+
+      {/* Open/available requests */}
       <div className="section-card">
         <div className="section-header">
           <h2>Available Requests</h2>
@@ -502,6 +525,168 @@ const ArchitectDashboard = () => {
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+// Assigned Requests Component
+const AssignedRequests = ({ onCreateFromAssigned }) => {
+  const [items, setItems] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  // Helpers: parse/normalize requirements into structured fields
+  const normalizeRequirements = (reqText, reqParsed) => {
+    // Prefer parsed JSON if valid
+    const src = (reqParsed && typeof reqParsed === 'object') ? reqParsed : {};
+    // Try to detect key info from text as best-effort
+    const text = (reqText || '').toString();
+    const pick = (k) => src[k] ?? null;
+    const extract = (label) => {
+      const m = text.match(new RegExp(label + ":\s*([^\n]+)", 'i'));
+      return m ? m[1].trim() : null;
+    };
+    return {
+      rooms: pick('rooms') ?? extract('rooms') ?? extract('bedrooms') ?? null,
+      family_needs: pick('family_needs') ?? extract('family needs') ?? null,
+      style: pick('preferred_style') ?? pick('style') ?? extract('style') ?? null,
+      notes: pick('notes') ?? null,
+      raw: text.trim()
+    };
+  };
+
+  const toClipboard = async (str) => {
+    try { await navigator.clipboard.writeText(str); } catch {}
+  };
+
+  const downloadText = (filename, content) => {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const load = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/buildhub/backend/api/architect/get_assigned_requests.php');
+      const data = await res.json();
+      if (data.success) {
+        setItems(data.assignments || []);
+      } else {
+        setError(data.message || 'Failed to load assigned requests');
+      }
+    } catch (e) {
+      setError('Error loading assigned requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => { load(); }, []);
+
+  const respond = async (assignment_id, action) => {
+    try {
+      await fetch('/buildhub/backend/api/architect/respond_assignment.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignment_id, action })
+      });
+      load();
+    } catch {}
+  };
+
+  return (
+    <div className="section-content">
+      {loading ? (
+        <div className="loading">Loading assigned requests...</div>
+      ) : items.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">📬</div>
+          <h3>No Assigned Requests</h3>
+          <p>Homeowners haven’t assigned requests to you yet.</p>
+          <button className="btn btn-secondary" onClick={load}>Refresh</button>
+        </div>
+      ) : (
+        <div className="item-list">
+          {items.map(a => (
+            <div key={a.assignment_id} className="list-item">
+              <div className="item-icon">📌</div>
+              <div className="item-content">
+                <h4 className="item-title">Request #{a.layout_request.id} • {a.layout_request.plot_size} sq ft</h4>
+                <p className="item-subtitle">Budget: {a.layout_request.budget_range} • From: {a.homeowner.name}</p>
+                <p className="item-meta">Assigned: {new Date(a.assigned_at).toLocaleDateString()} • Status: {a.assignment_status}</p>
+                {a.message && <p className="item-description">Message: {a.message}</p>}
+
+                {/* Interactive requirement details */}
+                {(() => {
+                  const R = normalizeRequirements(a.layout_request.requirements, a.layout_request.requirements_parsed);
+                  const chips = [
+                    R.rooms ? { label: 'Rooms', value: R.rooms } : null,
+                    R.family_needs ? { label: 'Family needs', value: R.family_needs } : null,
+                    (a.layout_request.preferred_style || R.style) ? { label: 'Style', value: a.layout_request.preferred_style || R.style } : null,
+                  ].filter(Boolean);
+                  return (
+                    <div className="details-card">
+                      <div className="details-header">
+                        <strong>Requirements</strong>
+                      </div>
+                      <div className="details-grid">
+                        <div>
+                          <h5>Site & Budget</h5>
+                          <div className="chips">
+                            <span className="chip"><strong>Plot:</strong> {a.layout_request.plot_size || '—'}</span>
+                            <span className="chip"><strong>Budget:</strong> {a.layout_request.budget_range || '—'}</span>
+                            <span className="chip"><strong>Location:</strong> {a.layout_request.location || '—'}</span>
+                            <span className="chip"><strong>Timeline:</strong> {a.layout_request.timeline || '—'}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <h5>Preferences</h5>
+                          <div className="chips">
+                            {(a.layout_request.layout_type || 'custom') && (
+                              <span className="chip"><strong>Type:</strong> {a.layout_request.layout_type || 'custom'}</span>
+                            )}
+                            {chips.map((c, idx) => (
+                              <span key={idx} className="chip"><strong>{c.label}:</strong> {c.value}</span>
+                            ))}
+                            {a.layout_request.library?.title && (
+                              <span className="chip"><strong>Library:</strong> {a.layout_request.library.title}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="span-2">
+                          <h5>Notes</h5>
+                          <p className="item-description">{R.notes || a.layout_request.requirements || '—'}</p>
+                          {a.layout_request.library?.image_url && (
+                            <div className="preview-row">
+                              <img src={a.layout_request.library.image_url} alt="Selected layout" className="preview-image" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="item-actions">
+                <button className="btn btn-secondary" onClick={load}>Refresh</button>
+                {a.assignment_status === 'sent' && (
+                  <>
+                    <button className="btn btn-success" onClick={() => respond(a.assignment_id, 'accept')}>Accept</button>
+                    <button className="btn btn-danger" onClick={() => respond(a.assignment_id, 'reject')}>Reject</button>
+                  </>
+                )}
+                <button className="btn btn-primary" onClick={() => onCreateFromAssigned?.(a.layout_request.id)}>
+                  Create Design
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

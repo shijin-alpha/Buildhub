@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
+import { Eye, EyeOff } from "lucide-react";
 
 const GOOGLE_CLIENT_ID = "1024134456606-et46lrm2ce8tl567a4m4s4e0u3v5t4sa.apps.googleusercontent.com";
 
@@ -21,6 +22,8 @@ const Register = () => {
     license: null,
     portfolio: null,
   });
+  const [showRegPwd, setShowRegPwd] = useState(false);
+  const [showRegConfirm, setShowRegConfirm] = useState(false);
 
   // Google registration state
   const [googleUserInfo, setGoogleUserInfo] = useState(null);
@@ -228,6 +231,12 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Update password strength on the fly
+    if (name === 'password') {
+      setPwdStrength(computeStrength(value));
+    }
+
     setError("");
     setSuccessMessage("");
   };
@@ -242,13 +251,30 @@ const Register = () => {
     setSuccessMessage("");
   };
 
-  const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+  // Allow any valid email domain
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  // Require: 8+ chars, at least one letter, one number, and one special character
   const validatePassword = (password) => {
     if (password.length < 8) return "Password must be at least 8 characters long.";
     if (/\s/.test(password)) return "Password cannot contain spaces.";
+    if (!/[A-Za-z]/.test(password)) return "Password must include at least one letter.";
+    if (!/[0-9]/.test(password)) return "Password must include at least one number.";
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password)) return "Password must include at least one special character.";
     return "";
   };
+
+  // Password strength computation (0-4)
+  const computeStrength = (pwd) => {
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(pwd)) score++;
+    return score;
+  };
+
+  const [pwdStrength, setPwdStrength] = useState(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -260,7 +286,7 @@ const Register = () => {
     if (!formData.firstName.trim()) return setError("First Name is required.");
     if (!formData.lastName.trim()) return setError("Last Name is required.");
     if (!formData.email) return setError("Email is required.");
-    if (!validateEmail(formData.email)) return setError("Enter a valid Gmail address.");
+    if (!validateEmail(formData.email)) return setError("Enter a valid email address.");
 
     const passwordError = validatePassword(formData.password);
     if (passwordError) return setError(passwordError);
@@ -418,7 +444,7 @@ const Register = () => {
               name="email"
               type="email"
               required
-              placeholder="@gmail.com"
+              placeholder="Email address"
               value={formData.email}
               onChange={handleChange}
             />
@@ -428,27 +454,62 @@ const Register = () => {
           <div className="grid-two-col">
             <div>
               <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                placeholder="Create a strong password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showRegPwd ? 'text' : 'password'}
+                  required
+                  placeholder="Create a strong password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={{ paddingRight: 36 }}
+                />
+                <button
+                  type="button"
+                  aria-label={showRegPwd ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowRegPwd(v=>!v)}
+                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {showRegPwd ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                </button>
+              </div>
+              {/* Password strength meter */}
+              <div className="pwd-meter" aria-live="polite">
+                <div
+                  className={`pwd-meter-bar s${pwdStrength}`}
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={4}
+                  aria-valuenow={pwdStrength}
+                />
+                <div className={`pwd-meter-label s${pwdStrength}`}>
+                  {pwdStrength <= 1 ? 'Weak' : pwdStrength === 2 ? 'Fair' : pwdStrength === 3 ? 'Good' : 'Strong'}
+                </div>
+              </div>
             </div>
             <div>
               <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                placeholder="Re-enter password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showRegConfirm ? 'text' : 'password'}
+                  required
+                  placeholder="Re-enter password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={{ paddingRight: 36 }}
+                />
+                <button
+                  type="button"
+                  aria-label={showRegConfirm ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowRegConfirm(v=>!v)}
+                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {showRegConfirm ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                </button>
+              </div>
             </div>
           </div>
 

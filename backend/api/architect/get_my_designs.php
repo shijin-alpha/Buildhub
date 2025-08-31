@@ -3,6 +3,9 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
+// Prevent caching of protected data
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 require_once '../../config/database.php';
 
@@ -24,13 +27,13 @@ try {
     
     // Get all designs by this architect
     $query = "SELECT d.*, lr.plot_size, lr.budget_range, lr.requirements,
-                     CONCAT(u.first_name, ' ', u.last_name) as client_name,
-                     u.email as client_email
-              FROM designs d 
-              JOIN layout_requests lr ON d.layout_request_id = lr.id
-              JOIN users u ON lr.user_id = u.id 
-              WHERE d.architect_id = :architect_id
-              ORDER BY d.created_at DESC";
+                         CONCAT(u.first_name, ' ', u.last_name) as client_name,
+                         u.email as client_email
+                  FROM designs d 
+                  JOIN layout_requests lr ON d.layout_request_id = lr.id
+                  JOIN users u ON lr.user_id = u.id 
+                  WHERE d.architect_id = :architect_id
+                  ORDER BY d.created_at DESC";
     
     $stmt = $db->prepare($query);
     $stmt->bindParam(':architect_id', $architect_id);

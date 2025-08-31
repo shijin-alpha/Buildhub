@@ -230,3 +230,25 @@
 
 )
 
+2025-08-29T15:10:02+02:00 | POST: Array
+(
+    [firstName] => Shijin
+    [lastName] => Thomas
+    [email] => shijinthomas248@gmail.com
+    [role] => contractor
+    [password] => 0.9d4qvt0d0j!A1
+)
+ | FILES: Array
+(
+    [license] => Array
+        (
+            [name] => license_20.jpeg
+            [full_path] => license_20.jpeg
+            [type] => image/jpeg
+            [tmp_name] => C:\xampp\tmp\php85B7.tmp
+            [error] => 0
+            [size] => 975503
+        )
+
+)
+

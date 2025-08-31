@@ -35,6 +35,9 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
+    // Strict: prevent cached back navigation
+    import('../utils/session').then(({ preventCache }) => preventCache());
+
     fetchSystemStats();
     if (activeTab === 'pending') {
       fetchPendingUsers();
@@ -338,10 +341,11 @@ const AdminDashboard = () => {
     setShowUserModal(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await fetch('/buildhub/backend/api/logout.php', { method: 'POST', credentials: 'include' }); } catch {}
     localStorage.removeItem('admin_logged_in');
     localStorage.removeItem('admin_username');
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const renderDashboard = () => (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ContractorDashboard.css';
 
@@ -11,17 +11,60 @@ const ContractorDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [userSetCollapsed, setUserSetCollapsed] = useState(false);
 
   useEffect(() => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
-    
-    if (userData.id) {
-      fetchLayoutRequests();
-      fetchMyProposals();
-    }
+
+    import('../utils/session').then(({ preventCache, verifyServerSession }) => {
+      preventCache();
+      (async () => {
+        const serverAuth = await verifyServerSession();
+        if (!userData.id || userData.role !== 'contractor' || !serverAuth) {
+          sessionStorage.removeItem('user');
+          localStorage.removeItem('bh_user');
+          navigate('/login', { replace: true });
+          return;
+        }
+        fetchLayoutRequests();
+        fetchMyProposals();
+      })();
+    });
   }, []);
+
+  // Close profile dropdown on outside click or ESC
+  useEffect(() => {
+    const onClick = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') setProfileOpen(false);
+    };
+    document.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('click', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, []);
+
+  // Auto-collapse on small screens unless user manually toggled
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1024px)');
+    const apply = () => {
+      if (!userSetCollapsed) setCollapsed(mq.matches);
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [userSetCollapsed]);
 
   const fetchLayoutRequests = async () => {
     setLoading(true);
@@ -50,13 +93,11 @@ const ContractorDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Clear user session data
+  const handleLogout = async () => {
+    try { await fetch('/buildhub/backend/api/logout.php', { method: 'POST', credentials: 'include' }); } catch {}
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
-    
-    // Redirect to login page
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const renderOverview = () => (
@@ -267,8 +308,9 @@ const ContractorDashboard = () => {
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="dashboard-sidebar">
+      <div className={`dashboard-sidebar ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
+
           <a href="#" className="sidebar-logo">
             <div className="logo-icon">🏠</div>
             <span className="logo-text">BUILDHUB</span>
@@ -280,54 +322,70 @@ const ContractorDashboard = () => {
             href="#" 
             className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }}
+            title="Dashboard"
           >
             <span className="nav-icon">📊</span>
-            Dashboard
+            <span className="nav-label">Dashboard</span>
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('projects'); }}
+            title="Cost Requests"
           >
             <span className="nav-icon">📋</span>
-            Cost Requests
+            <span className="nav-label">Cost Requests</span>
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'proposals' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('proposals'); }}
+            title="My Estimates"
           >
             <span className="nav-icon">📄</span>
-            My Estimates
+            <span className="nav-label">My Estimates</span>
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('profile'); }}
+            title="Profile"
           >
             <span className="nav-icon">👤</span>
-            Profile
+            <span className="nav-label">Profile</span>
           </a>
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="user-avatar">
-              {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-            </div>
-            <div className="user-info">
-              <h4>{user?.first_name} {user?.last_name}</h4>
-              <p>Contractor</p>
-            </div>
-          </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            <span style={{fontSize: '1.2rem'}}>🚪</span> Logout
-          </button>
-        </div>
+        {/* Edge toggle button */}
+        <button
+          className={`sidebar-edge-toggle ${collapsed ? 'collapsed' : ''}`}
+          onClick={() => { setCollapsed(v => !v); setUserSetCollapsed(true); }}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={collapsed ? 'Expand' : 'Collapse'}
+        >
+          <span className="edge-icon">{collapsed ? '›' : '‹'}</span>
+        </button>
       </div>
 
       {/* Main Content */}
       <div className="dashboard-main">
+        {/* Topbar with profile at top-right */}
+        <div className="topbar" role="banner">
+          <div className="topbar-spacer" />
+          <div className="topbar-profile" aria-label="User profile" ref={profileRef}>
+            <button className="topbar-user" onClick={() => setProfileOpen(v => !v)} aria-haspopup="menu" aria-expanded={profileOpen}>
+              <div className="topbar-avatar">{user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}</div>
+              <div className="topbar-meta">
+                <span className="topbar-name">{user?.first_name} {user?.last_name}</span>
+                <span className="topbar-role">Contractor</span>
+              </div>
+              <span className={`chevron ${profileOpen ? 'open' : ''}`}>▾</span>
+            </button>
+            <div className={`profile-menu ${profileOpen ? 'open' : ''}`} role="menu" aria-hidden={!profileOpen}>
+              <button className="profile-item" role="menuitem" onClick={handleLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
         {error && (
           <div className="alert alert-error">
             {error}

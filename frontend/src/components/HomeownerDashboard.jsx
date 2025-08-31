@@ -17,11 +17,33 @@ const HomeownerDashboard = () => {
   const [selectedLibraryLayout, setSelectedLibraryLayout] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Architect selection state
+  const [showArchitectModal, setShowArchitectModal] = useState(false);
+  const [architects, setArchitects] = useState([]);
+  const [archLoading, setArchLoading] = useState(false);
+  const [archError, setArchError] = useState('');
+  const [archSearch, setArchSearch] = useState('');
+  const [archSpec, setArchSpec] = useState('');
+  const [archMinExp, setArchMinExp] = useState('');
+  const [selectedArchitectId, setSelectedArchitectId] = useState(null);
+  const [assignMessage, setAssignMessage] = useState('');
+  const [selectedRequestForAssign, setSelectedRequestForAssign] = useState(null);
+
   // Request form state
   const [requestData, setRequestData] = useState({
+    // Site details
     plot_size: '',
+    plot_shape: '',
+    topography: '',
+    development_laws: '',
+    // Family needs
+    family_needs: '',
+    rooms: '',
+    // Budget & aesthetics
     budget_range: '',
-    requirements: '',
+    aesthetic: '',
+    // Other
+    requirements: '', // additional notes
     location: '',
     timeline: '',
     selected_layout_id: null,
@@ -32,12 +54,22 @@ const HomeownerDashboard = () => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
-    
-    if (userData.id) {
-      fetchMyRequests();
-      fetchMyProjects();
-      fetchLayoutLibrary();
-    }
+
+    import('../utils/session').then(({ preventCache, verifyServerSession }) => {
+      preventCache();
+      (async () => {
+        const serverAuth = await verifyServerSession();
+        if (!userData.id || userData.role !== 'homeowner' || !serverAuth) {
+          sessionStorage.removeItem('user');
+          localStorage.removeItem('bh_user');
+          navigate('/login', { replace: true });
+          return;
+        }
+        fetchMyRequests();
+        fetchMyProjects();
+        fetchLayoutLibrary();
+      })();
+    });
   }, []);
 
   const fetchMyRequests = async () => {
@@ -79,10 +111,91 @@ const HomeownerDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
+  // Architect directory + assignment
+  const fetchArchitects = async (params = {}) => {
+    setArchLoading(true);
+    setArchError('');
+    try {
+      const q = new URLSearchParams({
+        ...(params.search ? { search: params.search } : {}),
+        ...(params.specialization ? { specialization: params.specialization } : {}),
+        ...(params.min_experience ? { min_experience: params.min_experience } : {}),
+        ...(params.layout_request_id ? { layout_request_id: params.layout_request_id } : {}),
+      }).toString();
+      const response = await fetch(`/buildhub/backend/api/homeowner/get_architects.php${q ? `?${q}` : ''}`);
+      const result = await response.json();
+      if (result.success) {
+        setArchitects(result.architects || []);
+      } else {
+        setArchError(result.message || 'Failed to load architects');
+      }
+    } catch (e) {
+      setArchError('Error loading architects');
+    } finally {
+      setArchLoading(false);
+    }
+  };
+
+  const openArchitectModal = (request) => {
+    setSelectedRequestForAssign(request);
+    setSelectedArchitectId(null);
+    setAssignMessage('');
+    setShowArchitectModal(true);
+    // Pass layout_request_id so backend can mark already assigned architects
+    fetchArchitects({ search: archSearch, specialization: archSpec, min_experience: archMinExp, layout_request_id: request?.id });
+  };
+
+  const handleAssignArchitect = async () => {
+    if (!selectedRequestForAssign) {
+      setArchError('No request selected');
+      return;
+    }
+    // Collect selected architect IDs (multi-select)
+    const selectedIds = Array.isArray(selectedArchitectId)
+      ? selectedArchitectId
+      : (selectedArchitectId ? [selectedArchitectId] : []);
+    if (selectedIds.length === 0) {
+      setArchError('Please select at least one architect');
+      return;
+    }
+    try {
+      setArchLoading(true);
+      // Guard: require layout_request_id
+      if (!selectedRequestForAssign?.id) {
+        setArchError('Please select a request first');
+        setArchLoading(false);
+        return;
+      }
+      const response = await fetch('/buildhub/backend/api/homeowner/assign_architect.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          layout_request_id: selectedRequestForAssign.id,
+          architect_ids: selectedIds,
+          message: assignMessage
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSuccess('Request sent to selected architect(s)');
+        setShowArchitectModal(false);
+        setSelectedRequestForAssign(null);
+        setSelectedArchitectId(null);
+      } else {
+        setArchError(result.message || 'Failed to send request');
+      }
+    } catch (e) {
+      setArchError('Error sending request');
+    } finally {
+      setArchLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try { await fetch('/buildhub/backend/api/logout.php', { method: 'POST', credentials: 'include' }); } catch {}
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handleRequestSubmit = async (e) => {
@@ -108,7 +221,13 @@ const HomeownerDashboard = () => {
         setShowRequestForm(false);
         setRequestData({
           plot_size: '',
+          plot_shape: '',
+          topography: '',
+          development_laws: '',
+          family_needs: '',
+          rooms: '',
           budget_range: '',
+          aesthetic: '',
           requirements: '',
           location: '',
           timeline: '',
@@ -116,6 +235,12 @@ const HomeownerDashboard = () => {
           layout_type: 'custom'
         });
         fetchMyRequests();
+        // Open architect selection modal right after submit
+        setSelectedRequestForAssign({ id: result.request_id });
+        setSelectedArchitectId(null);
+        setAssignMessage('');
+        setShowArchitectModal(true);
+        fetchArchitects({ search: archSearch, specialization: archSpec, min_experience: archMinExp });
       } else {
         setError('Failed to submit request: ' + result.message);
       }
@@ -338,7 +463,7 @@ const HomeownerDashboard = () => {
           ) : (
             <div className="item-list">
               {layoutRequests.map(request => (
-                <RequestItem key={request.id} request={request} />
+                <RequestItem key={request.id} request={request} onAssignArchitect={() => openArchitectModal(request)} />
               ))}
             </div>
           )}
@@ -581,6 +706,71 @@ const HomeownerDashboard = () => {
                   </div>
                 </div>
 
+                {/* Site details */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Plot Shape</label>
+                    <input
+                      type="text"
+                      value={requestData.plot_shape}
+                      onChange={(e) => setRequestData({...requestData, plot_shape: e.target.value})}
+                      placeholder="e.g., Rectangular, Square, Irregular"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Topography</label>
+                    <input
+                      type="text"
+                      value={requestData.topography}
+                      onChange={(e) => setRequestData({...requestData, topography: e.target.value})}
+                      placeholder="e.g., Flat, Sloped, Rocky"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Local Development Laws / Restrictions</label>
+                  <input
+                    type="text"
+                    value={requestData.development_laws}
+                    onChange={(e) => setRequestData({...requestData, development_laws: e.target.value})}
+                    placeholder="e.g., Setbacks, FSI/FAR, height limits"
+                  />
+                </div>
+
+                {/* Family needs */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Family Needs</label>
+                    <input
+                      type="text"
+                      value={requestData.family_needs}
+                      onChange={(e) => setRequestData({...requestData, family_needs: e.target.value})}
+                      placeholder="e.g., Elder-friendly, Work-from-home, Kids play area"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Rooms</label>
+                    <input
+                      type="text"
+                      value={requestData.rooms}
+                      onChange={(e) => setRequestData({...requestData, rooms: e.target.value})}
+                      placeholder="e.g., 3 Bedrooms, 1 Study, 1 Puja Room"
+                    />
+                  </div>
+                </div>
+
+                {/* Aesthetic */}
+                <div className="form-group">
+                  <label>House Aesthetic / Style</label>
+                  <input
+                    type="text"
+                    value={requestData.aesthetic}
+                    onChange={(e) => setRequestData({...requestData, aesthetic: e.target.value})}
+                    placeholder="e.g., Modern, Traditional, Minimalist"
+                  />
+                </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Location</label>
@@ -606,11 +796,12 @@ const HomeownerDashboard = () => {
                   </div>
                 </div>
 
+                {/* Additional notes */}
                 <div className="form-group">
                   <label>
                     {requestData.layout_type === 'library' 
                       ? 'Customization Requirements *' 
-                      : 'Requirements & Specifications *'
+                      : 'Additional Notes'
                     }
                   </label>
                   <textarea
@@ -619,10 +810,10 @@ const HomeownerDashboard = () => {
                     placeholder={
                       requestData.layout_type === 'library'
                         ? "Describe any modifications you'd like to make to the selected layout: room changes, additional features, material preferences, etc."
-                        : "Describe your requirements: number of bedrooms, bathrooms, kitchen style, special features, etc."
+                        : "Any other preferences or constraints"
                     }
                     rows="4"
-                    required
+                    required={requestData.layout_type === 'library'}
                   />
                 </div>
 
@@ -656,6 +847,142 @@ const HomeownerDashboard = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Architect Selection Modal */}
+        {showArchitectModal && (
+          <div className="form-modal">
+            <div className="form-content architect-modal">
+              <div className="form-header">
+                <h3>Select Architect</h3>
+                <p>Choose an architect to send your request</p>
+                <button className="modal-close" onClick={() => setShowArchitectModal(false)}>×</button>
+              </div>
+
+              {/* Request selection fallback */}
+              {(!selectedRequestForAssign || !selectedRequestForAssign.id) ? (
+                <div className="form-group">
+                  <label>Select one of your requests</label>
+                  <select
+                    value={selectedRequestForAssign?.id || ''}
+                    onChange={(e) => {
+                      const req = layoutRequests.find(r => String(r.id) === e.target.value);
+                      setSelectedRequestForAssign(req || null);
+                    }}
+                  >
+                    <option value="">-- Select request --</option>
+                    {layoutRequests.map(r => (
+                      <option key={r.id} value={r.id}>
+                        #{r.id} • {r.layout_type === 'library' ? (r.selected_layout_title || 'Library') : 'Custom'} • {r.plot_size} sq ft
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="info-row">
+                  <span className="status-chip">For Request #{selectedRequestForAssign.id}</span>
+                </div>
+              )}
+
+              <div className="filters-row">
+                <input
+                  type="text"
+                  placeholder="Search name/company/email"
+                  value={archSearch}
+                  onChange={(e) => setArchSearch(e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Specialization (optional)"
+                  value={archSpec}
+                  onChange={(e) => setArchSpec(e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Min experience"
+                  value={archMinExp}
+                  onChange={(e) => setArchMinExp(e.target.value)}
+                  min="0"
+                />
+                <button className="btn btn-secondary" onClick={() => fetchArchitects({ search: archSearch, specialization: archSpec, min_experience: archMinExp })}>
+                  Search
+                </button>
+              </div>
+
+              {archError && <div className="alert alert-error">{archError}</div>}
+
+              <div className="architects-list">
+                {archLoading ? (
+                  <div className="loading">Loading architects...</div>
+                ) : architects.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">🧑‍🎨</div>
+                    <h3>No architects found</h3>
+                    <p>Adjust your filters and try again</p>
+                  </div>
+                ) : (
+                  <div className="item-list">
+                    {architects.map(a => {
+                      const already = !!a.already_assigned;
+                      const status = a.assignment_status; // sent | accepted | declined | null
+                      return (
+                        <label key={a.id} className={`list-item ${already ? 'disabled' : ''} ${Array.isArray(selectedArchitectId) ? selectedArchitectId.includes(a.id) ? 'selected' : '' : (selectedArchitectId === a.id ? 'selected' : '')}`}>
+                          <div className="item-icon">🧑‍🎨</div>
+                          <div className="item-content">
+                            <h4 className="item-title">{a.first_name} {a.last_name} {a.company_name ? `• ${a.company_name}` : ''}</h4>
+                            <p className="item-subtitle">{a.specialization || 'General'}</p>
+                            <p className="item-meta">Experience: {a.experience_years ?? 'N/A'} yrs • {a.email}</p>
+                            {already && (
+                              <div className="status-row">
+                                <span className={`status-chip ${status === 'accepted' ? 'success' : status === 'declined' ? 'danger' : ''}`}>
+                                  {status ? `Already ${status}` : 'Sent already'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="item-actions">
+                            <input 
+                              type="checkbox" 
+                              disabled={already}
+                              checked={Array.isArray(selectedArchitectId) ? selectedArchitectId.includes(a.id) : selectedArchitectId === a.id}
+                              onChange={(e) => {
+                                if (Array.isArray(selectedArchitectId)) {
+                                  setSelectedArchitectId(
+                                    e.target.checked
+                                      ? [...selectedArchitectId, a.id]
+                                      : selectedArchitectId.filter(id => id !== a.id)
+                                  );
+                                } else {
+                                  setSelectedArchitectId(e.target.checked ? [a.id] : []);
+                                }
+                              }}
+                            />
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Message to architect (optional)</label>
+                <textarea
+                  value={assignMessage}
+                  onChange={(e) => setAssignMessage(e.target.value)}
+                  placeholder="Add any notes for the architect"
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-actions">
+                <button className="btn btn-secondary" onClick={() => setShowArchitectModal(false)}>Cancel</button>
+                <button className="btn btn-primary" disabled={archLoading || !selectedArchitectId} onClick={handleAssignArchitect}>
+                  {archLoading ? 'Sending...' : 'Send Request'}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -706,7 +1033,7 @@ const HomeownerDashboard = () => {
 };
 
 // Request Item Component
-const RequestItem = ({ request }) => (
+const RequestItem = ({ request, onAssignArchitect }) => (
   <div className="list-item">
     <div className="item-icon">
       {request.layout_type === 'library' ? '📚' : 
@@ -731,28 +1058,24 @@ const RequestItem = ({ request }) => (
         {request.location && ` • ${request.location}`}
         • Designs: {request.design_count} • Proposals: {request.proposal_count}
       </p>
-      <p className="item-description">
-        {request.layout_type === 'library' 
-          ? `Customization: ${request.requirements}`
-          : request.requirements
-        }
-      </p>
-      {request.layout_type === 'library' && request.selected_layout_image && (
-        <div className="request-layout-preview">
-          <img 
-            src={request.selected_layout_image} 
-            alt={request.selected_layout_title}
-            className="request-layout-image"
-          />
-        </div>
-      )}
+      <div className="status-row">
+        <span className="status-chip">Sent: {request.sent_count || 0}</span>
+        <span className="status-chip success">Accepted: {request.accepted_count || 0}</span>
+        <span className="status-chip danger">Rejected: {request.rejected_count || 0}</span>
+      </div>
+      {/* Minimal homeowner view: hide requirements & large preview */}
     </div>
     <div className="item-actions">
       <span className={`status-badge ${request.status}`}>
         {request.status}
       </span>
-      <button className="btn btn-secondary">
-        View Details
+      <button className="btn btn-secondary" onClick={() => alert('Details modal coming soon')}>View Details</button>
+      <button 
+        className="btn btn-primary"
+        onClick={onAssignArchitect}
+        title="Send this request to a selected architect"
+      >
+        Send to Architect
       </button>
     </div>
   </div>

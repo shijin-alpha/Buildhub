@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Register.css';
 import '../styles/Login.css';
+import { Eye, EyeOff } from 'lucide-react';
 
 const GOOGLE_CLIENT_ID = "1024134456606-et46lrm2ce8tl567a4m4s4e0u3v5t4sa.apps.googleusercontent.com";
 
@@ -12,7 +13,25 @@ const Login = () => {
   });
 
   const [error, setError] = useState('');
+  const [showLoginPwd, setShowLoginPwd] = useState(false);
   const navigate = useNavigate();
+
+  // If navigating back from dashboards, ensure server session exists before redirecting forward
+  useEffect(() => {
+    (async () => {
+      const storedUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+      let serverAuth = false;
+      try {
+        const res = await fetch('/buildhub/backend/api/session_check.php', { credentials: 'include' });
+        const data = await res.json();
+        serverAuth = !!data.authenticated;
+      } catch {}
+
+      if (storedUser?.role === 'homeowner' && serverAuth) navigate('/homeowner-dashboard', { replace: true });
+      else if (storedUser?.role === 'contractor' && serverAuth) navigate('/contractor-dashboard', { replace: true });
+      else if (storedUser?.role === 'architect' && serverAuth) navigate('/architect-dashboard', { replace: true });
+    })();
+  }, []);
 
   // Google Sign-In state
   const googleBtn = useRef(null);
@@ -70,11 +89,8 @@ const Login = () => {
   };
 
   const validateEmail = email => {
-    // Allow admin email or Gmail addresses
-    if (email === 'shijinthomas369@gmail.com') {
-      return true;
-    }
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    // Allow any valid email address
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
@@ -97,7 +113,7 @@ const Login = () => {
     }
 
     if (!validateEmail(formData.email)) {
-      setError('Please enter a valid Gmail address or admin email.');
+      setError('Please enter a valid email address.');
       return;
     }
 
@@ -239,7 +255,7 @@ const Login = () => {
               name="email"
               type="email"
               required
-              placeholder="your.email@gmail.com"
+              placeholder="Email address"
               value={formData.email}
               onChange={handleChange}
               autoComplete="email"
@@ -249,17 +265,28 @@ const Login = () => {
 
           <div className="full-width">
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="current-password"
-              aria-describedby="passwordError"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                id="password"
+                name="password"
+                type={showLoginPwd ? 'text' : 'password'}
+                required
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+                aria-describedby="passwordError"
+                style={{ paddingRight: 36 }}
+              />
+              <button
+                type="button"
+                aria-label={showLoginPwd ? 'Hide password' : 'Show password'}
+                onClick={() => setShowLoginPwd(v=>!v)}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {showLoginPwd ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
 
           {error && (

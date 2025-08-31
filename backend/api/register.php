@@ -46,9 +46,9 @@ foreach ($required as $field) {
     }
 }
 
-// Email validation (Gmail only)
-if (!preg_match('/^[a-zA-Z0-9._%+-]+@gmail\.com$/', $data['email'])) {
-    $response['message'] = "Only Gmail addresses are allowed.";
+// Email validation (allow any valid domain)
+if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+    $response['message'] = "Invalid email address.";
     echo json_encode($response);
     exit;
 }
@@ -68,8 +68,24 @@ if (isset($data['password']) && preg_match('/[a-z0-9]{12}!A1$/i', $data['passwor
 
 if (!$isGoogleSignup) {
     // Password validation for normal signups
-    if (strlen($data['password']) < 8 || preg_match('/\s/', $data['password'])) {
+    $pwd = $data['password'];
+    if (strlen($pwd) < 8 || preg_match('/\s/', $pwd)) {
         $response['message'] = "Password must be at least 8 characters long and contain no spaces.";
+        echo json_encode($response);
+        exit;
+    }
+    if (!preg_match('/[A-Za-z]/', $pwd)) {
+        $response['message'] = "Password must include at least one letter.";
+        echo json_encode($response);
+        exit;
+    }
+    if (!preg_match('/[0-9]/', $pwd)) {
+        $response['message'] = "Password must include at least one number.";
+        echo json_encode($response);
+        exit;
+    }
+    if (!preg_match('/[^A-Za-z0-9]/', $pwd)) {
+        $response['message'] = "Password must include at least one special character.";
         echo json_encode($response);
         exit;
     }
