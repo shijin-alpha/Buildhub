@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 import Register from "./components/Register.jsx";
 import Login from "./components/Login.jsx";
+<<<<<<< HEAD
 import ForgotPassword from "./components/ForgotPassword.jsx";
 import ResetPassword from "./components/ResetPassword.jsx";
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 import HomeownerDashboard from "./components/HomeownerDashboard.jsx";
 import ContractorDashboard from "./components/ContractorDashboard.jsx";
 import ArchitectDashboard from "./components/ArchitectDashboard.jsx";
@@ -11,9 +14,12 @@ import AuthorizedRedirectURIs from "./components/AuthorizedRedirectURIs.jsx";
 import AdminLogin from "./components/AdminLogin.jsx";
 import AdminDashboard from "./components/AdminDashboard.jsx";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute.jsx";
+<<<<<<< HEAD
 import HomeownerRoute from "./components/HomeownerRoute.jsx";
 import ArchitectRoute from "./components/ArchitectRoute.jsx";
 import ContractorRoute from "./components/ContractorRoute.jsx";
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
 // Home page component
 function Home() {
@@ -118,7 +124,10 @@ function Home() {
           </a>
           <Link to="/login">Login</Link>
           <Link to="/register">Register</Link>
+<<<<<<< HEAD
           <Link to="/forgot-password">Forgot Password</Link>
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         </nav>
       </header>
 
@@ -216,6 +225,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+<<<<<<< HEAD
         <Route path="/homeowner-dashboard" element={
           <HomeownerRoute>
             <HomeownerDashboard />
@@ -231,6 +241,11 @@ export default function App() {
             <ArchitectDashboard />
           </ArchitectRoute>
         } />
+=======
+        <Route path="/homeowner-dashboard" element={<HomeownerDashboard />} />
+        <Route path="/contractor-dashboard" element={<ContractorDashboard />} />
+        <Route path="/architect-dashboard" element={<ArchitectDashboard />} />
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         <Route path="/authorized-redirect-uris" element={<AuthorizedRedirectURIs />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin-dashboard" element={
@@ -238,8 +253,11 @@ export default function App() {
             <AdminDashboard />
           </ProtectedAdminRoute>
         } />
+<<<<<<< HEAD
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       </Routes>
     </Router>
   );

@@ -26,7 +26,11 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
     
     // Validate required fields
+<<<<<<< HEAD
     if (!isset($input['plot_size']) || !isset($input['budget_range'])) {
+=======
+    if (!isset($input['plot_size']) || !isset($input['budget_range']) || !isset($input['requirements'])) {
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         echo json_encode([
             'success' => false,
             'message' => 'Missing required fields'
@@ -36,11 +40,16 @@ try {
     
     $plot_size = $input['plot_size'];
     $budget_range = $input['budget_range'];
+<<<<<<< HEAD
     $requirements = $input['requirements'] ?? '';
+=======
+    $requirements = $input['requirements'];
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     $location = $input['location'] ?? '';
     $timeline = $input['timeline'] ?? '';
     $selected_layout_id = $input['selected_layout_id'] ?? null;
     $layout_type = $input['layout_type'] ?? 'custom';
+<<<<<<< HEAD
 
     // New structured fields
     $plot_shape = $input['plot_shape'] ?? null;
@@ -58,6 +67,16 @@ try {
         plot_size VARCHAR(100) NOT NULL,
         budget_range VARCHAR(100) NOT NULL,
         requirements TEXT NULL,
+=======
+    
+    // Create layout_requests table if it doesn't exist
+    $create_table_query = "CREATE TABLE IF NOT EXISTS layout_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        plot_size VARCHAR(100) NOT NULL,
+        budget_range VARCHAR(100) NOT NULL,
+        requirements TEXT NOT NULL,
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         location VARCHAR(255),
         timeline VARCHAR(100),
         selected_layout_id INT NULL,
@@ -66,12 +85,17 @@ try {
         layout_file VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+<<<<<<< HEAD
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (homeowner_id) REFERENCES users(id) ON DELETE CASCADE,
+=======
+        FOREIGN KEY (user_id) REFERENCES users(id),
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         FOREIGN KEY (selected_layout_id) REFERENCES layout_library(id)
     )";
     $db->exec($create_table_query);
     
+<<<<<<< HEAD
     // Pack structured fields into JSON for the existing 'requirements' column
     $requirements_payload = [
         'plot_shape' => $plot_shape,
@@ -97,12 +121,24 @@ try {
     $stmt->bindParam(':plot_size', $plot_size);
     $stmt->bindParam(':budget_range', $budget_range);
     $stmt->bindParam(':requirements', $requirements_json);
+=======
+    // Insert layout request
+    $query = "INSERT INTO layout_requests (user_id, plot_size, budget_range, requirements, location, timeline, selected_layout_id, layout_type) 
+              VALUES (:user_id, :plot_size, :budget_range, :requirements, :location, :timeline, :selected_layout_id, :layout_type)";
+    
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $homeowner_id);
+    $stmt->bindParam(':plot_size', $plot_size);
+    $stmt->bindParam(':budget_range', $budget_range);
+    $stmt->bindParam(':requirements', $requirements);
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     $stmt->bindParam(':location', $location);
     $stmt->bindParam(':timeline', $timeline);
     $stmt->bindParam(':selected_layout_id', $selected_layout_id);
     $stmt->bindParam(':layout_type', $layout_type);
     
     if ($stmt->execute()) {
+<<<<<<< HEAD
         $requestId = (int)$db->lastInsertId();
 
         // If this is a library selection and the layout has an architect, auto-create assignment
@@ -142,6 +178,12 @@ try {
             'success' => true,
             'message' => 'Layout request submitted successfully',
             'request_id' => $requestId
+=======
+        echo json_encode([
+            'success' => true,
+            'message' => 'Layout request submitted successfully',
+            'request_id' => $db->lastInsertId()
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         ]);
     } else {
         echo json_encode([

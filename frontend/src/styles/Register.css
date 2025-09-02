@@ -248,6 +248,7 @@ select:focus {
   box-shadow: 0 4px 12px rgba(11, 94, 215, 0.2);
 }
 
+<<<<<<< HEAD
 /* Back link (small pill) */
 .back-link {
   display: inline-flex;
@@ -276,6 +277,8 @@ select:focus {
   height: 16px;
 }
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 /* Google role selection card */
 .google-role-form {
   margin-top: 18px;
@@ -364,6 +367,7 @@ select:focus {
   background: linear-gradient(90deg, rgba(11,94,215,0.15), rgba(11,94,215,0.35), rgba(11,94,215,0.15));
 }
 
+<<<<<<< HEAD
 /* Password strength meter */
 .pwd-meter {
   position: relative;
@@ -429,6 +433,8 @@ select:focus {
 .pwd-meter-label.s3 { color: #2d98da; }
 .pwd-meter-label.s4 { color: #06d6a0; transform: translateY(-1px); }
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 /* Helper text and links */
 .error {
   font-size: 0.9rem;

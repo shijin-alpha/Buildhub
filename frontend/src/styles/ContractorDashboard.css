@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ContractorDashboard - Blue Theme (matches Login palette)
    Responsive layout, hover animations, and interactive UI */
 
@@ -351,3 +352,232 @@
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .section-header h2 { font-size: 1.25rem; }
 }
+=======
+/* ContractorDashboard.css */
+
+/* Prevents unwanted horizontal scrolling */
+body {
+  overflow-x: hidden;
+}
+
+/* Main Layout */
+.contractor-dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #1e293b;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar nav button {
+  background: transparent;
+  color: white;
+  border: none;
+  text-align: left;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sidebar nav button:hover,
+.sidebar nav button.active {
+  background: #334155;
+  border-radius: 5px;
+}
+
+.logout-btn {
+  margin-top: auto;
+  background: #ef4444;
+  padding: 10px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 30px;
+}
+
+.main-content h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.tab-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Requests Grid */
+.requests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.request-card {
+  background: #f1f5f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.request-card h3 {
+  margin-bottom: 10px;
+}
+
+.request-card button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.request-card button:hover {
+  background: #2563eb;
+}
+
+/* Estimates Table */
+.estimates-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.estimates-table th,
+.estimates-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.estimates-table th {
+  background: #f1f5f9;
+}
+
+/* Profile Card */
+.profile-card {
+  background: #f1f5f9;
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 400px;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-content h3 {
+  margin-bottom: 15px;
+}
+
+.modal-content textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 10px;
+}
+
+.modal-content button {
+  padding: 8px 12px;
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.modal-content button:first-of-type {
+  background: #3b82f6;
+  color: white;
+}
+
+.modal-content button:first-of-type:hover {
+  background: #2563eb;
+}
+
+.modal-content button:last-of-type {
+  background: #e5e7eb;
+}
+
+.modal-content button:last-of-type:hover {
+  background: #d1d5db;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235

@@ -5,10 +5,13 @@ import '../styles/HomeownerDashboard.css';
 const HomeownerDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+<<<<<<< HEAD
   const [receivedDesigns, setReceivedDesigns] = useState([]);
   const [comments, setComments] = useState({}); // designId -> list
   const [commentDrafts, setCommentDrafts] = useState({}); // designId -> text
   const [commentRatings, setCommentRatings] = useState({}); // designId -> 1..5
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   const [user, setUser] = useState(null);
   const [layoutRequests, setLayoutRequests] = useState([]);
   const [myProjects, setMyProjects] = useState([]);
@@ -21,6 +24,7 @@ const HomeownerDashboard = () => {
   const [selectedLibraryLayout, setSelectedLibraryLayout] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+<<<<<<< HEAD
   // Image/Layout preview modal state
   const [previewLayout, setPreviewLayout] = useState(null);
   const isImageUrl = (url) => /\.(png|jpe?g|gif|webp|bmp)$/i.test(url || '');
@@ -53,6 +57,13 @@ const HomeownerDashboard = () => {
     aesthetic: '',
     // Other
     requirements: '', // additional notes
+=======
+  // Request form state
+  const [requestData, setRequestData] = useState({
+    plot_size: '',
+    budget_range: '',
+    requirements: '',
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     location: '',
     timeline: '',
     selected_layout_id: null,
@@ -63,6 +74,7 @@ const HomeownerDashboard = () => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
+<<<<<<< HEAD
 
     import('../utils/session').then(({ preventCache, verifyServerSession }) => {
       preventCache();
@@ -80,6 +92,14 @@ const HomeownerDashboard = () => {
         fetchReceivedDesigns();
       })();
     });
+=======
+    
+    if (userData.id) {
+      fetchMyRequests();
+      fetchMyProjects();
+      fetchLayoutLibrary();
+    }
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   }, []);
 
   const fetchMyRequests = async () => {
@@ -121,6 +141,7 @@ const HomeownerDashboard = () => {
     }
   };
 
+<<<<<<< HEAD
   const fetchReceivedDesigns = async () => {
     try {
       const response = await fetch('/buildhub/backend/api/homeowner/get_received_designs.php');
@@ -301,6 +322,12 @@ const HomeownerDashboard = () => {
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
     navigate('/login', { replace: true });
+=======
+  const handleLogout = () => {
+    localStorage.removeItem('bh_user');
+    sessionStorage.removeItem('user');
+    navigate('/login');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   };
 
   const handleRequestSubmit = async (e) => {
@@ -326,6 +353,7 @@ const HomeownerDashboard = () => {
         setShowRequestForm(false);
         setRequestData({
           plot_size: '',
+<<<<<<< HEAD
           plot_shape: '',
           topography: '',
           development_laws: '',
@@ -333,6 +361,9 @@ const HomeownerDashboard = () => {
           rooms: '',
           budget_range: '',
           aesthetic: '',
+=======
+          budget_range: '',
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           requirements: '',
           location: '',
           timeline: '',
@@ -340,12 +371,15 @@ const HomeownerDashboard = () => {
           layout_type: 'custom'
         });
         fetchMyRequests();
+<<<<<<< HEAD
         // Open architect selection modal right after submit
         setSelectedRequestForAssign({ id: result.request_id });
         setSelectedArchitectId(null);
         setAssignMessage('');
         setShowArchitectModal(true);
         fetchArchitects({ search: archSearch, specialization: archSpec, min_experience: archMinExp });
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       } else {
         setError('Failed to submit request: ' + result.message);
       }
@@ -568,6 +602,7 @@ const HomeownerDashboard = () => {
           ) : (
             <div className="item-list">
               {layoutRequests.map(request => (
+<<<<<<< HEAD
                 <RequestItem key={request.id} request={request} onAssignArchitect={() => openArchitectModal(request)} />
               ))}
             </div>
@@ -694,6 +729,9 @@ const HomeownerDashboard = () => {
                     )}
                   </div>
                 </div>
+=======
+                <RequestItem key={request.id} request={request} />
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
               ))}
             </div>
           )}
@@ -740,9 +778,12 @@ const HomeownerDashboard = () => {
                   key={layout.id} 
                   layout={layout} 
                   onSelect={() => handleSelectFromLibrary(layout)}
+<<<<<<< HEAD
                   onPreview={() => setPreviewLayout(layout)}
                   isImageUrl={isImageUrl}
                   isPdfUrl={isPdfUrl}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                 />
               ))}
             </div>
@@ -829,6 +870,7 @@ const HomeownerDashboard = () => {
           </a>
           <a 
             href="#" 
+<<<<<<< HEAD
             className={`nav-item ${activeTab === 'designs' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('designs'); fetchReceivedDesigns(); }}
           >
@@ -837,6 +879,8 @@ const HomeownerDashboard = () => {
           </a>
           <a 
             href="#" 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
             className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('projects'); }}
           >
@@ -863,6 +907,7 @@ const HomeownerDashboard = () => {
 
       {/* Main Content */}
       <div className="dashboard-main">
+<<<<<<< HEAD
         {/* In-page alerts */}
         <div style={{position:'fixed', top:20, right:20, zIndex:1000, display:'flex', flexDirection:'column', gap:10}}>
           {error && (
@@ -878,11 +923,29 @@ const HomeownerDashboard = () => {
             </div>
           )}
         </div>
+=======
+        {error && (
+          <div className="alert alert-error">
+            {error}
+            <button onClick={() => setError('')} className="alert-close">×</button>
+          </div>
+        )}
+        
+        {success && (
+          <div className="alert alert-success">
+            {success}
+            <button onClick={() => setSuccess('')} className="alert-close">×</button>
+          </div>
+        )}
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
         {activeTab === 'dashboard' && renderDashboard()}
         {activeTab === 'library' && renderLibrary()}
         {activeTab === 'requests' && renderRequests()}
+<<<<<<< HEAD
         {activeTab === 'designs' && renderReceivedDesigns()}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         {activeTab === 'projects' && renderProjects()}
 
         {/* Request Form Modal */}
@@ -950,6 +1013,7 @@ const HomeownerDashboard = () => {
                   </div>
                 </div>
 
+<<<<<<< HEAD
                 {/* Site details */}
                 <div className="form-row">
                   <div className="form-group">
@@ -1015,6 +1079,8 @@ const HomeownerDashboard = () => {
                   />
                 </div>
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                 <div className="form-row">
                   <div className="form-group">
                     <label>Location</label>
@@ -1040,12 +1106,19 @@ const HomeownerDashboard = () => {
                   </div>
                 </div>
 
+<<<<<<< HEAD
                 {/* Additional notes */}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                 <div className="form-group">
                   <label>
                     {requestData.layout_type === 'library' 
                       ? 'Customization Requirements *' 
+<<<<<<< HEAD
                       : 'Additional Notes'
+=======
+                      : 'Requirements & Specifications *'
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                     }
                   </label>
                   <textarea
@@ -1054,10 +1127,17 @@ const HomeownerDashboard = () => {
                     placeholder={
                       requestData.layout_type === 'library'
                         ? "Describe any modifications you'd like to make to the selected layout: room changes, additional features, material preferences, etc."
+<<<<<<< HEAD
                         : "Any other preferences or constraints"
                     }
                     rows="4"
                     required={requestData.layout_type === 'library'}
+=======
+                        : "Describe your requirements: number of bedrooms, bathrooms, kitchen style, special features, etc."
+                    }
+                    rows="4"
+                    required
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                   />
                 </div>
 
@@ -1095,6 +1175,7 @@ const HomeownerDashboard = () => {
           </div>
         )}
 
+<<<<<<< HEAD
         {/* Architect Selection Modal */}
         {showArchitectModal && (
           <div className="form-modal">
@@ -1239,6 +1320,8 @@ const HomeownerDashboard = () => {
           </div>
         )}
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         {/* Library Modal */}
         {showLibraryModal && (
           <div className="form-modal">
@@ -1270,9 +1353,12 @@ const HomeownerDashboard = () => {
                         key={layout.id} 
                         layout={layout} 
                         onSelect={() => handleSelectFromLibrary(layout)}
+<<<<<<< HEAD
                         onPreview={() => setPreviewLayout(layout)}
                         isImageUrl={isImageUrl}
                         isPdfUrl={isPdfUrl}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                         isModal={true}
                       />
                     ))}
@@ -1282,6 +1368,7 @@ const HomeownerDashboard = () => {
             </div>
           </div>
         )}
+<<<<<<< HEAD
 
         {/* Preview modal for image + layout */}
         {previewLayout && (
@@ -1319,13 +1406,19 @@ const HomeownerDashboard = () => {
             </div>
           </div>
         )}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       </div>
     </div>
   );
 };
 
 // Request Item Component
+<<<<<<< HEAD
 const RequestItem = ({ request, onAssignArchitect }) => (
+=======
+const RequestItem = ({ request }) => (
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   <div className="list-item">
     <div className="item-icon">
       {request.layout_type === 'library' ? '📚' : 
@@ -1350,17 +1443,36 @@ const RequestItem = ({ request, onAssignArchitect }) => (
         {request.location && ` • ${request.location}`}
         • Designs: {request.design_count} • Proposals: {request.proposal_count}
       </p>
+<<<<<<< HEAD
       <div className="status-row">
         <span className="status-chip">Sent: {request.sent_count || 0}</span>
         <span className="status-chip success">Accepted: {request.accepted_count || 0}</span>
         <span className="status-chip danger">Rejected: {request.rejected_count || 0}</span>
       </div>
       {/* Minimal homeowner view: hide requirements & large preview */}
+=======
+      <p className="item-description">
+        {request.layout_type === 'library' 
+          ? `Customization: ${request.requirements}`
+          : request.requirements
+        }
+      </p>
+      {request.layout_type === 'library' && request.selected_layout_image && (
+        <div className="request-layout-preview">
+          <img 
+            src={request.selected_layout_image} 
+            alt={request.selected_layout_title}
+            className="request-layout-image"
+          />
+        </div>
+      )}
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     </div>
     <div className="item-actions">
       <span className={`status-badge ${request.status}`}>
         {request.status}
       </span>
+<<<<<<< HEAD
       <button className="btn btn-secondary" onClick={() => alert('Details modal coming soon')}>View Details</button>
       <button 
         className="btn btn-primary"
@@ -1368,6 +1480,10 @@ const RequestItem = ({ request, onAssignArchitect }) => (
         title="Send this request to a selected architect"
       >
         Send to Architect
+=======
+      <button className="btn btn-secondary">
+        View Details
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       </button>
     </div>
   </div>
@@ -1397,6 +1513,7 @@ const ProjectItem = ({ project }) => (
 );
 
 // Layout Card Component
+<<<<<<< HEAD
 const LayoutCard = ({ layout, onSelect, onPreview, isImageUrl, isPdfUrl, isModal = false }) => (
   <div className={`layout-card ${isModal ? 'modal-card' : ''}`}>
     <div className="layout-image-container">
@@ -1416,6 +1533,20 @@ const LayoutCard = ({ layout, onSelect, onPreview, isImageUrl, isPdfUrl, isModal
             Select Layout
           </button>
         </div>
+=======
+const LayoutCard = ({ layout, onSelect, isModal = false }) => (
+  <div className={`layout-card ${isModal ? 'modal-card' : ''}`}>
+    <div className="layout-image-container">
+      <img 
+        src={layout.image_url || '/images/default-layout.jpg'} 
+        alt={layout.title}
+        className="layout-card-image"
+      />
+      <div className="layout-overlay">
+        <button className="btn btn-primary" onClick={onSelect}>
+          Select Layout
+        </button>
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       </div>
     </div>
     <div className="layout-card-content">
@@ -1426,9 +1557,12 @@ const LayoutCard = ({ layout, onSelect, onPreview, isImageUrl, isPdfUrl, isModal
         <span className="spec">🚿 {layout.bathrooms} BA</span>
         <span className="spec">📐 {layout.area} sq ft</span>
       </div>
+<<<<<<< HEAD
       {layout.architect_name && (
         <p className="layout-author" style={{margin: '6px 0', color: '#555'}}>By {layout.architect_name}</p>
       )}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       {layout.description && (
         <p className="layout-description">{layout.description}</p>
       )}
@@ -1441,6 +1575,9 @@ const LayoutCard = ({ layout, onSelect, onPreview, isImageUrl, isPdfUrl, isModal
   </div>
 );
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 export default HomeownerDashboard;

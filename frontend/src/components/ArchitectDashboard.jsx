@@ -14,6 +14,7 @@ const ArchitectDashboard = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+<<<<<<< HEAD
   // My library state
   const [libraryLayouts, setLibraryLayouts] = useState([]);
   const [showLibraryForm, setShowLibraryForm] = useState(false);
@@ -25,6 +26,11 @@ const ArchitectDashboard = () => {
   const [uploadData, setUploadData] = useState({
     request_id: '',
     homeowner_id: '', // optional: send directly to a homeowner
+=======
+  // Upload form state
+  const [uploadData, setUploadData] = useState({
+    request_id: '',
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     design_title: '',
     description: '',
     files: []
@@ -34,6 +40,7 @@ const ArchitectDashboard = () => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
+<<<<<<< HEAD
 
     // Strict: prevent cached back navigation showing dashboard
     import('../utils/session').then(({ preventCache, verifyServerSession }) => {
@@ -52,6 +59,13 @@ const ArchitectDashboard = () => {
         fetchMyLibrary();
       })();
     });
+=======
+    
+    if (userData.id) {
+      fetchLayoutRequests();
+      fetchMyDesigns();
+    }
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   }, []);
 
   const fetchLayoutRequests = async () => {
@@ -81,6 +95,7 @@ const ArchitectDashboard = () => {
     }
   };
 
+<<<<<<< HEAD
   const fetchMyLibrary = async () => {
     try {
       const res = await fetch('/buildhub/backend/api/architect/get_my_layouts.php');
@@ -179,23 +194,40 @@ const ArchitectDashboard = () => {
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
     navigate('/login', { replace: true });
+=======
+  const handleLogout = () => {
+    localStorage.removeItem('bh_user');
+    sessionStorage.removeItem('user');
+    navigate('/login');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   };
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     // Only require files; backend will auto-route to the appropriate homeowner/request and default title
     if (uploadData.files.length === 0) {
       setError('Please select at least one file');
+=======
+    if (!uploadData.request_id || !uploadData.design_title || uploadData.files.length === 0) {
+      setError('Please fill all required fields and select files');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       return;
     }
 
     try {
       setLoading(true);
       const formData = new FormData();
+<<<<<<< HEAD
       if (uploadData.request_id) formData.append('request_id', uploadData.request_id);
       if (uploadData.homeowner_id) formData.append('homeowner_id', uploadData.homeowner_id);
       if (uploadData.design_title) formData.append('design_title', uploadData.design_title);
       if (uploadData.description) formData.append('description', uploadData.description);
+=======
+      formData.append('request_id', uploadData.request_id);
+      formData.append('design_title', uploadData.design_title);
+      formData.append('description', uploadData.description);
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       
       // Handle multiple files
       for (let i = 0; i < uploadData.files.length; i++) {
@@ -213,7 +245,10 @@ const ArchitectDashboard = () => {
         setShowUploadForm(false);
         setUploadData({
           request_id: '',
+<<<<<<< HEAD
           homeowner_id: '',
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           design_title: '',
           description: '',
           files: []
@@ -364,7 +399,11 @@ const ArchitectDashboard = () => {
         <div className="header-content">
           <div>
             <h1>Layout Requests</h1>
+<<<<<<< HEAD
             <p>Client requests sent to you and open requests</p>
+=======
+            <p>Client requests waiting for architectural designs</p>
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           </div>
           <button 
             className="btn btn-primary"
@@ -375,6 +414,7 @@ const ArchitectDashboard = () => {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Assigned to me */}
       <div className="section-card">
         <div className="section-header">
@@ -385,6 +425,8 @@ const ArchitectDashboard = () => {
       </div>
 
       {/* Open/available requests */}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       <div className="section-card">
         <div className="section-header">
           <h2>Available Requests</h2>
@@ -467,6 +509,7 @@ const ArchitectDashboard = () => {
     </div>
   );
 
+<<<<<<< HEAD
   const renderLibrary = () => (
     <div>
       <div className="main-header">
@@ -684,6 +727,8 @@ const ArchitectDashboard = () => {
     </div>
   );
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   return (
     <div className="dashboard-container">
       {/* Mobile Menu Button */}
@@ -728,6 +773,7 @@ const ArchitectDashboard = () => {
             <span className="nav-icon">🎨</span>
             My Designs
           </a>
+<<<<<<< HEAD
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'library' ? 'active' : ''}`}
@@ -736,6 +782,8 @@ const ArchitectDashboard = () => {
             <span className="nav-icon">📚</span>
             My Layout Library
           </a>
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         </nav>
 
         <div className="sidebar-footer">
@@ -773,7 +821,10 @@ const ArchitectDashboard = () => {
         {activeTab === 'dashboard' && renderDashboard()}
         {activeTab === 'requests' && renderRequests()}
         {activeTab === 'designs' && renderDesigns()}
+<<<<<<< HEAD
         {activeTab === 'library' && renderLibrary()}
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
         {/* Upload Form Modal */}
         {showUploadForm && (
@@ -787,6 +838,7 @@ const ArchitectDashboard = () => {
               <form onSubmit={handleUploadSubmit}>
                 <div className="form-row">
                   <div className="form-group">
+<<<<<<< HEAD
                     <label>Send To</label>
                     <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
                       <div>
@@ -813,6 +865,21 @@ const ArchitectDashboard = () => {
                         />
                       </div>
                     </div>
+=======
+                    <label>Select Request *</label>
+                    <select
+                      value={uploadData.request_id}
+                      onChange={(e) => setUploadData({...uploadData, request_id: e.target.value})}
+                      required
+                    >
+                      <option value="">Choose a client request</option>
+                      {layoutRequests.map(request => (
+                        <option key={request.id} value={request.id}>
+                          {request.client_name} - {request.plot_size} sq ft ({request.budget_range})
+                        </option>
+                      ))}
+                    </select>
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                   </div>
                   <div className="form-group">
                     <label>Design Title *</label>
@@ -837,6 +904,7 @@ const ArchitectDashboard = () => {
                 </div>
 
                 <div className="form-group">
+<<<<<<< HEAD
                   <label>Design Files *</label>
                   <input
                     type="file"
@@ -846,6 +914,17 @@ const ArchitectDashboard = () => {
                     required
                   />
                   <p className="form-help">Select multiple files (images, PDFs, docs, CAD/3D, archives, videos)</p>
+=======
+                  <label>Design Files * (PDF, JPG, PNG, DWG)</label>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.dwg"
+                    onChange={(e) => setUploadData({...uploadData, files: Array.from(e.target.files)})}
+                    required
+                  />
+                  <p className="form-help">You can select multiple files. Supported formats: PDF, JPG, PNG, DWG</p>
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
                 </div>
 
                 <div className="form-actions">
@@ -873,6 +952,7 @@ const ArchitectDashboard = () => {
   );
 };
 
+<<<<<<< HEAD
 // Assigned Requests Component
 const AssignedRequests = ({ onCreateFromAssigned }) => {
   const [items, setItems] = React.useState([]);
@@ -1035,6 +1115,8 @@ const AssignedRequests = ({ onCreateFromAssigned }) => {
   );
 };
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 // Request Item Component
 const RequestItem = ({ request, onCreateDesign }) => (
   <div className="list-item">

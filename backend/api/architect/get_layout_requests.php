@@ -32,6 +32,7 @@ try {
             'plot_size' => $row['plot_size'],
             'budget_range' => $row['budget_range'],
             'requirements' => $row['requirements'],
+<<<<<<< HEAD
             // decode structured requirements if JSON
             'requirements_parsed' => json_decode($row['requirements'], true),
             'plot_shape' => $row['plot_shape'],
@@ -40,6 +41,8 @@ try {
             'family_needs' => $row['family_needs'],
             'rooms' => $row['rooms'],
             'aesthetic' => $row['aesthetic'],
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
             'location' => $row['location'] ?? 'Not specified',
             'layout_file' => $row['layout_file'],
             'created_at' => $row['created_at'],

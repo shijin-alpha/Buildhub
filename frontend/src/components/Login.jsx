@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Register.css';
 import '../styles/Login.css';
+<<<<<<< HEAD
 import { Eye, EyeOff } from 'lucide-react';
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
 const GOOGLE_CLIENT_ID = "1024134456606-et46lrm2ce8tl567a4m4s4e0u3v5t4sa.apps.googleusercontent.com";
 
@@ -13,6 +16,7 @@ const Login = () => {
   });
 
   const [error, setError] = useState('');
+<<<<<<< HEAD
   const [showLoginPwd, setShowLoginPwd] = useState(false);
   const navigate = useNavigate();
 
@@ -33,6 +37,10 @@ const Login = () => {
     })();
   }, []);
 
+=======
+  const navigate = useNavigate();
+
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   // Google Sign-In state
   const googleBtn = useRef(null);
   const [googleError, setGoogleError] = useState('');
@@ -89,8 +97,16 @@ const Login = () => {
   };
 
   const validateEmail = email => {
+<<<<<<< HEAD
     // Allow any valid email address
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+=======
+    // Allow admin email or Gmail addresses
+    if (email === 'shijinthomas369@gmail.com') {
+      return true;
+    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     return emailRegex.test(email);
   };
 
@@ -113,7 +129,11 @@ const Login = () => {
     }
 
     if (!validateEmail(formData.email)) {
+<<<<<<< HEAD
       setError('Please enter a valid email address.');
+=======
+      setError('Please enter a valid Gmail address or admin email.');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       return;
     }
 
@@ -255,7 +275,11 @@ const Login = () => {
               name="email"
               type="email"
               required
+<<<<<<< HEAD
               placeholder="Email address"
+=======
+              placeholder="your.email@gmail.com"
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
               value={formData.email}
               onChange={handleChange}
               autoComplete="email"
@@ -265,6 +289,7 @@ const Login = () => {
 
           <div className="full-width">
             <label htmlFor="password">Password</label>
+<<<<<<< HEAD
             <div style={{ position: 'relative' }}>
               <input
                 id="password"
@@ -287,6 +312,19 @@ const Login = () => {
                 {showLoginPwd ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
               </button>
             </div>
+=======
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              aria-describedby="passwordError"
+            />
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           </div>
 
           {error && (

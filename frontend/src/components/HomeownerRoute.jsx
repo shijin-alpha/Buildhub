@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -21,6 +22,19 @@ const HomeownerRoute = ({ children }) => {
 
   if (!checked) return null;
   if (!ok) return <Navigate to="/login" replace />;
+=======
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+
+const HomeownerRoute = ({ children }) => {
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  
+  // Check if user is logged in and is a homeowner
+  if (!user.id || user.role !== 'homeowner') {
+    return <Navigate to="/login" replace />;
+  }
+  
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   return children;
 };
 

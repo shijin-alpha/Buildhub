@@ -36,6 +36,7 @@ if (!empty($data['google']) && !empty($data['email'])) {
         exit;
     }
 
+<<<<<<< HEAD
     // Start PHP session and set user session
     session_start();
     $_SESSION['user_id'] = $user['id'];
@@ -43,6 +44,8 @@ if (!empty($data['google']) && !empty($data['email'])) {
     $_SESSION['first_name'] = $user['first_name'];
     $_SESSION['last_name'] = $user['last_name'];
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     $response['success'] = true;
     $response['message'] = "Login successful!";
     $response['user'] = [
@@ -96,9 +99,15 @@ if ($data['email'] === $adminUsername && $data['password'] === $adminPassword) {
     exit;
 }
 
+<<<<<<< HEAD
 // Allow any valid email domain for regular users
 if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
     $response['message'] = "Invalid email address.";
+=======
+// Only allow Gmail addresses for regular users
+if (!preg_match('/^[a-zA-Z0-9._%+-]+@gmail\.com$/', $data['email'])) {
+    $response['message'] = "Only Gmail addresses are allowed for user accounts.";
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     echo json_encode($response);
     exit;
 }
@@ -129,6 +138,7 @@ if (($user['role'] === 'contractor' || $user['role'] === 'architect') && !$user[
     exit;
 }
 
+<<<<<<< HEAD
 // Start PHP session and set user session for regular login
 session_start();
 $_SESSION['user_id'] = $user['id'];
@@ -136,6 +146,8 @@ $_SESSION['role'] = $user['role'];
 $_SESSION['first_name'] = $user['first_name'];
 $_SESSION['last_name'] = $user['last_name'];
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 // Success: set redirect based on role
 $response['success'] = true;
 $response['message'] = "Login successful!";

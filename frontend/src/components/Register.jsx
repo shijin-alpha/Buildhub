@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
+<<<<<<< HEAD
 import { Eye, EyeOff } from "lucide-react";
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
 const GOOGLE_CLIENT_ID = "1024134456606-et46lrm2ce8tl567a4m4s4e0u3v5t4sa.apps.googleusercontent.com";
 
@@ -22,8 +25,11 @@ const Register = () => {
     license: null,
     portfolio: null,
   });
+<<<<<<< HEAD
   const [showRegPwd, setShowRegPwd] = useState(false);
   const [showRegConfirm, setShowRegConfirm] = useState(false);
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
   // Google registration state
   const [googleUserInfo, setGoogleUserInfo] = useState(null);
@@ -231,12 +237,15 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+<<<<<<< HEAD
 
     // Update password strength on the fly
     if (name === 'password') {
       setPwdStrength(computeStrength(value));
     }
 
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     setError("");
     setSuccessMessage("");
   };
@@ -251,6 +260,7 @@ const Register = () => {
     setSuccessMessage("");
   };
 
+<<<<<<< HEAD
   // Allow any valid email domain
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -276,6 +286,16 @@ const Register = () => {
 
   const [pwdStrength, setPwdStrength] = useState(0);
 
+=======
+  const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+
+  const validatePassword = (password) => {
+    if (password.length < 8) return "Password must be at least 8 characters long.";
+    if (/\s/.test(password)) return "Password cannot contain spaces.";
+    return "";
+  };
+
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -286,7 +306,11 @@ const Register = () => {
     if (!formData.firstName.trim()) return setError("First Name is required.");
     if (!formData.lastName.trim()) return setError("Last Name is required.");
     if (!formData.email) return setError("Email is required.");
+<<<<<<< HEAD
     if (!validateEmail(formData.email)) return setError("Enter a valid email address.");
+=======
+    if (!validateEmail(formData.email)) return setError("Enter a valid Gmail address.");
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
     const passwordError = validatePassword(formData.password);
     if (passwordError) return setError(passwordError);
@@ -444,7 +468,11 @@ const Register = () => {
               name="email"
               type="email"
               required
+<<<<<<< HEAD
               placeholder="Email address"
+=======
+              placeholder="@gmail.com"
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
               value={formData.email}
               onChange={handleChange}
             />
@@ -454,6 +482,7 @@ const Register = () => {
           <div className="grid-two-col">
             <div>
               <label htmlFor="password">Password</label>
+<<<<<<< HEAD
               <div style={{ position: 'relative' }}>
                 <input
                   id="password"
@@ -510,6 +539,29 @@ const Register = () => {
                   {showRegConfirm ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
                 </button>
               </div>
+=======
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="Create a strong password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                placeholder="Re-enter password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
             </div>
           </div>
 

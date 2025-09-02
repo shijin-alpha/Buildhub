@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
+<<<<<<< HEAD
 -- Generation Time: Aug 31, 2025 at 06:34 PM
+=======
+-- Generation Time: Aug 15, 2025 at 01:57 PM
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +28,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+<<<<<<< HEAD
 -- Table structure for table `admin_logs`
 --
 
@@ -321,6 +326,8 @@ CREATE TABLE `proposals` (
 -- --------------------------------------------------------
 
 --
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 -- Table structure for table `users`
 --
 
@@ -328,7 +335,22 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
+<<<<<<< HEAD
   `profile_image` varchar(255) DEFAULT NULL,
+=======
+  `phone` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `state` varchar(50) DEFAULT NULL,
+  `zip_code` varchar(10) DEFAULT NULL,
+  `profile_image` varchar(255) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `specialization` varchar(255) DEFAULT NULL,
+  `experience_years` int(11) DEFAULT NULL,
+  `license_number` varchar(100) DEFAULT NULL,
+  `company_name` varchar(255) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `role` enum('homeowner','contractor','architect') DEFAULT NULL,
@@ -344,6 +366,7 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
+<<<<<<< HEAD
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `profile_image`, `email`, `password`, `role`, `status`, `is_verified`, `license`, `portfolio`, `created_at`, `updated_at`) VALUES
 (19, 'Shijin', 'Thomas', NULL, 'thomasshijin12@gmail.com', '$2y$10$3gq5TYKFrxe79x7Bd6zfYeop4C3lPHlT0RBbDCRK8Wd/olTpWnsNK', 'homeowner', 'approved', 1, NULL, NULL, '2025-08-15 08:37:34', '2025-08-15 11:29:50'),
 (26, 'APARNA K SANTHOSH', 'MCA2024-2026', NULL, 'aparnaksanthosh2026@mca.ajce.in', '$2y$10$3h5YpKY7duoyJ5YHWNRtpOP0a5hyLXfCiy1mzGG.Dgsaz10KZMehu', 'architect', 'pending', 1, NULL, 'uploads/portfolios/68a421323b2f3_license_20.jpeg', '2025-08-19 07:01:06', '2025-08-19 07:01:41'),
@@ -351,12 +374,19 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `profile_image`, `email`, 
 (28, 'SHIJIN THOMAS', 'MCA2024-2026', NULL, 'shijinthomas2026@mca.ajce.in', '$2y$10$J243fQ/Wi88Bk9UbtlSKvOJStinlPcePeWgV8C0gApCZnxbG5qRfe', 'homeowner', 'pending', 1, NULL, NULL, '2025-08-22 17:48:50', '2025-08-22 17:48:50'),
 (29, 'Shijin', 'Thomas', NULL, 'shijinthomas248@gmail.com', '$2y$10$m6o/je.6qIdMD6/k17enr.0QD0PAYSYSIyhTHF5b9Hs57hpqMsvR6', 'contractor', 'pending', 1, 'uploads/licenses/68b1a6aa444ec_license_20.jpeg', NULL, '2025-08-29 13:10:02', '2025-08-29 13:10:28'),
 (30, 'Fathima', 'Shibu', NULL, 'fathima470077@gmail.com', '$2y$10$ZFxAkA99J0LlBoYyr0TPne2PTEc5qFDDwFOCYoaZnH3m6a/ztMRSG', 'homeowner', 'pending', 1, NULL, NULL, '2025-08-31 05:37:04', '2025-08-31 05:59:14');
+=======
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `phone`, `address`, `city`, `state`, `zip_code`, `profile_image`, `bio`, `specialization`, `experience_years`, `license_number`, `company_name`, `website`, `email`, `password`, `role`, `status`, `is_verified`, `license`, `portfolio`, `created_at`, `updated_at`) VALUES
+(19, 'Shijin', 'Thomas', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'thomasshijin12@gmail.com', '$2y$10$3gq5TYKFrxe79x7Bd6zfYeop4C3lPHlT0RBbDCRK8Wd/olTpWnsNK', 'homeowner', 'approved', 1, NULL, NULL, '2025-08-15 08:37:34', '2025-08-15 11:29:50'),
+(20, 'Shijin', 'Thomas', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'shijinthomas248@gmail.com', '$2y$10$a.t0M4XwY5fP9XrrPYQdbOUY/OlHg6DaCUcWcw5unr87WC.bRxAx6', 'contractor', 'pending', 1, 'uploads/licenses/689ef28be6f60_license.jpeg', NULL, '2025-08-15 08:40:44', '2025-08-15 09:18:01'),
+(21, 'Shijin', 'Thomas', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'shijinthomas1501@gmail.com', '$2y$10$l82yykygxrE71jFPopliw.jV64a3vO9GB1lAtH7P.uyJqSo/ZNOoi', 'architect', 'pending', 1, NULL, 'uploads/portfolios/689f066e47a60_port.jpg', '2025-08-15 10:05:34', '2025-08-15 10:05:53');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
 --
 -- Indexes for dumped tables
 --
 
 --
+<<<<<<< HEAD
 -- Indexes for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
@@ -457,6 +487,8 @@ ALTER TABLE `proposals`
   ADD PRIMARY KEY (`id`);
 
 --
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -468,6 +500,7 @@ ALTER TABLE `users`
 --
 
 --
+<<<<<<< HEAD
 -- AUTO_INCREMENT for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
@@ -606,6 +639,12 @@ ALTER TABLE `layout_request_assignments`
   ADD CONSTRAINT `layout_request_assignments_ibfk_1` FOREIGN KEY (`layout_request_id`) REFERENCES `layout_requests` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `layout_request_assignments_ibfk_2` FOREIGN KEY (`homeowner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `layout_request_assignments_ibfk_3` FOREIGN KEY (`architect_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+=======
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

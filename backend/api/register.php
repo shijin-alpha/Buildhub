@@ -46,9 +46,15 @@ foreach ($required as $field) {
     }
 }
 
+<<<<<<< HEAD
 // Email validation (allow any valid domain)
 if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
     $response['message'] = "Invalid email address.";
+=======
+// Email validation (Gmail only)
+if (!preg_match('/^[a-zA-Z0-9._%+-]+@gmail\.com$/', $data['email'])) {
+    $response['message'] = "Only Gmail addresses are allowed.";
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
     echo json_encode($response);
     exit;
 }
@@ -68,12 +74,17 @@ if (isset($data['password']) && preg_match('/[a-z0-9]{12}!A1$/i', $data['passwor
 
 if (!$isGoogleSignup) {
     // Password validation for normal signups
+<<<<<<< HEAD
     $pwd = $data['password'];
     if (strlen($pwd) < 8 || preg_match('/\s/', $pwd)) {
+=======
+    if (strlen($data['password']) < 8 || preg_match('/\s/', $data['password'])) {
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         $response['message'] = "Password must be at least 8 characters long and contain no spaces.";
         echo json_encode($response);
         exit;
     }
+<<<<<<< HEAD
     if (!preg_match('/[A-Za-z]/', $pwd)) {
         $response['message'] = "Password must include at least one letter.";
         echo json_encode($response);
@@ -89,6 +100,8 @@ if (!$isGoogleSignup) {
         echo json_encode($response);
         exit;
     }
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 }
 // For Google signups, skip password validation (random password is accepted)
 // --------------------------------------------------------------------------------------

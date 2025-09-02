@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -23,6 +24,18 @@ const ProtectedAdminRoute = ({ children }) => {
 
   if (!checked) return null;
   if (!ok) return <Navigate to="/login" replace />;
+=======
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+
+const ProtectedAdminRoute = ({ children }) => {
+  const isAdminLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+  
+  if (!isAdminLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   return children;
 };
 

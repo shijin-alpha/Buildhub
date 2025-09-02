@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 import { useNavigate } from 'react-router-dom';
 import '../styles/ContractorDashboard.css';
 
@@ -11,15 +15,19 @@ const ContractorDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+<<<<<<< HEAD
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const [collapsed, setCollapsed] = useState(false);
   const [userSetCollapsed, setUserSetCollapsed] = useState(false);
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
 
   useEffect(() => {
     // Get user data from session
     const userData = JSON.parse(sessionStorage.getItem('user') || '{}');
     setUser(userData);
+<<<<<<< HEAD
 
     import('../utils/session').then(({ preventCache, verifyServerSession }) => {
       preventCache();
@@ -66,6 +74,15 @@ const ContractorDashboard = () => {
     return () => mq.removeEventListener('change', apply);
   }, [userSetCollapsed]);
 
+=======
+    
+    if (userData.id) {
+      fetchLayoutRequests();
+      fetchMyProposals();
+    }
+  }, []);
+
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   const fetchLayoutRequests = async () => {
     setLoading(true);
     try {
@@ -93,11 +110,21 @@ const ContractorDashboard = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleLogout = async () => {
     try { await fetch('/buildhub/backend/api/logout.php', { method: 'POST', credentials: 'include' }); } catch {}
     localStorage.removeItem('bh_user');
     sessionStorage.removeItem('user');
     navigate('/login', { replace: true });
+=======
+  const handleLogout = () => {
+    // Clear user session data
+    localStorage.removeItem('bh_user');
+    sessionStorage.removeItem('user');
+    
+    // Redirect to login page
+    navigate('/login');
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
   };
 
   const renderOverview = () => (
@@ -308,9 +335,14 @@ const ContractorDashboard = () => {
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
+<<<<<<< HEAD
       <div className={`dashboard-sidebar ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
 
+=======
+      <div className="dashboard-sidebar">
+        <div className="sidebar-header">
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           <a href="#" className="sidebar-logo">
             <div className="logo-icon">🏠</div>
             <span className="logo-text">BUILDHUB</span>
@@ -322,33 +354,52 @@ const ContractorDashboard = () => {
             href="#" 
             className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }}
+<<<<<<< HEAD
             title="Dashboard"
           >
             <span className="nav-icon">📊</span>
             <span className="nav-label">Dashboard</span>
+=======
+          >
+            <span className="nav-icon">📊</span>
+            Dashboard
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('projects'); }}
+<<<<<<< HEAD
             title="Cost Requests"
           >
             <span className="nav-icon">📋</span>
             <span className="nav-label">Cost Requests</span>
+=======
+          >
+            <span className="nav-icon">📋</span>
+            Cost Requests
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'proposals' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('proposals'); }}
+<<<<<<< HEAD
             title="My Estimates"
           >
             <span className="nav-icon">📄</span>
             <span className="nav-label">My Estimates</span>
+=======
+          >
+            <span className="nav-icon">📄</span>
+            My Estimates
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
           </a>
           <a 
             href="#" 
             className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); setActiveTab('profile'); }}
+<<<<<<< HEAD
             title="Profile"
           >
             <span className="nav-icon">👤</span>
@@ -365,10 +416,33 @@ const ContractorDashboard = () => {
         >
           <span className="edge-icon">{collapsed ? '›' : '‹'}</span>
         </button>
+=======
+          >
+            <span className="nav-icon">👤</span>
+            Profile
+          </a>
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <div className="user-avatar">
+              {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
+            </div>
+            <div className="user-info">
+              <h4>{user?.first_name} {user?.last_name}</h4>
+              <p>Contractor</p>
+            </div>
+          </div>
+          <button className="logout-btn" onClick={handleLogout}>
+            <span style={{fontSize: '1.2rem'}}>🚪</span> Logout
+          </button>
+        </div>
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
       </div>
 
       {/* Main Content */}
       <div className="dashboard-main">
+<<<<<<< HEAD
         {/* Topbar with profile at top-right */}
         <div className="topbar" role="banner">
           <div className="topbar-spacer" />
@@ -386,6 +460,8 @@ const ContractorDashboard = () => {
             </div>
           </div>
         </div>
+=======
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
         {error && (
           <div className="alert alert-error">
             {error}

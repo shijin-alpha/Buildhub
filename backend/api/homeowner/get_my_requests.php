@@ -27,6 +27,7 @@ try {
                      ll.title as selected_layout_title,
                      ll.layout_type as selected_layout_type,
                      ll.image_url as selected_layout_image,
+<<<<<<< HEAD
                      COUNT(DISTINCT d.id) as design_count,
                      COUNT(DISTINCT cp.id) as proposal_count,
                      SUM(CASE WHEN a.status = 'accepted' THEN 1 ELSE 0 END) as accepted_count,
@@ -37,6 +38,14 @@ try {
               LEFT JOIN designs d ON lr.id = d.layout_request_id
               LEFT JOIN contractor_proposals cp ON lr.id = cp.layout_request_id
               LEFT JOIN layout_request_assignments a ON a.layout_request_id = lr.id
+=======
+                     COUNT(d.id) as design_count,
+                     COUNT(p.id) as proposal_count
+              FROM layout_requests lr 
+              LEFT JOIN layout_library ll ON lr.selected_layout_id = ll.id
+              LEFT JOIN designs d ON lr.id = d.layout_request_id
+              LEFT JOIN proposals p ON lr.id = p.layout_request_id
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
               WHERE lr.user_id = :homeowner_id
               GROUP BY lr.id
               ORDER BY lr.created_at DESC";
@@ -52,6 +61,7 @@ try {
             'plot_size' => $row['plot_size'],
             'budget_range' => $row['budget_range'],
             'requirements' => $row['requirements'],
+<<<<<<< HEAD
             // decode structured requirements if JSON
             'requirements_parsed' => json_decode($row['requirements'], true),
             'plot_shape' => $row['plot_shape'] ?? null,
@@ -62,17 +72,26 @@ try {
             'aesthetic' => $row['aesthetic'] ?? null,
             'location' => $row['location'] ?? null,
             'timeline' => $row['timeline'] ?? null,
+=======
+            'location' => $row['location'],
+            'timeline' => $row['timeline'],
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
             'layout_type' => $row['layout_type'],
             'selected_layout_id' => $row['selected_layout_id'],
             'selected_layout_title' => $row['selected_layout_title'],
             'selected_layout_type' => $row['selected_layout_type'],
             'selected_layout_image' => $row['selected_layout_image'],
             'status' => $row['status'] ?? 'pending',
+<<<<<<< HEAD
             'design_count' => (int)$row['design_count'],
             'proposal_count' => (int)$row['proposal_count'],
             'sent_count' => isset($row['sent_count']) ? (int)$row['sent_count'] : 0,
             'accepted_count' => isset($row['accepted_count']) ? (int)$row['accepted_count'] : 0,
             'rejected_count' => isset($row['rejected_count']) ? (int)$row['rejected_count'] : 0,
+=======
+            'design_count' => $row['design_count'],
+            'proposal_count' => $row['proposal_count'],
+>>>>>>> 72588aad4ec69605b25ef4fe70cda4054305a235
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at']
         ];
