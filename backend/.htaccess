@@ -1,0 +1,4 @@
+# Allow Google Sign-In popup communication
+Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+Header always set Cross-Origin-Embedder-Policy "credentialless"
+Header always set Cross-Origin-Resource-Policy "cross-origin"
